@@ -27,3 +27,9 @@ make install
 ```
 make help
 ```
+
+
+### Update
+```
+make update
+```
