@@ -48,7 +48,7 @@ move-back-after-dir:
 
 # Set up project structure
 structure-setup:
-	@$(call indent2, "=== Setting up project structure ===")
+	@$(call indent2, "=== STEP 1: Setting up project structure ===")
 	
 	@$(call indent4, "Sourcing static files...")
 	@nvim --headless -c "luafile $(LUA_CONFIG_DIR)/remap.lua" -c "qa!"
@@ -60,7 +60,7 @@ structure-setup:
 
 # Install packer.nvim
 install-packer:
-	@$(call indent2, "=== Step 1: Installing packer.nvim ===")
+	@$(call indent2, "=== STEP 2: Installing packer.nvim ===")
 	@$(call indent4, "Checking if packer.nvim is already installed...")
 	@if [ ! -d "$(PACKER_DIR)" ]; then \
 		$(call indent4, "packer.nvim not found. Installing..."); \
@@ -72,20 +72,19 @@ install-packer:
 
 # Sync plugins
 sync-plugins:
-	@$(call indent2, "=== Step 2: Syncing plugins with :PackerSync ===")
+	@$(call indent2, "=== STEP 3: Syncing plugins with :PackerSync ===")
 	@$(call indent4, "Running :PackerSync to install/update plugins...")
-	@nvim --headless -c "luafile $(LUA_CONFIG_DIR)/packer.lua" -c "PackerSync" -c "qa!"
-	@$(call indent2, "=== Step 2 complete: Plugins synced. ===")
+	@nvim --headless -c "luafile $(LUA_CONFIG_DIR)/packer.lua" -c "autocmd User PackerComplete quitall" -c "PackerSync"
+	@$(call indent2, "=== STEP 3: complete: Plugins synced. ===")
 
 # Source after directory (only after plugins are installed)
 source-after-config:
-	@$(call indent2, "=== Step 3: Sourcing after directory configuration files ===")
-	@$(call indent4, "Lua files to source: $(AFTER_LUA_FILES)")
+	@$(call indent2, "=== STEP 4: Sourcing after directory configuration files ===")
 	@for file in $(AFTER_LUA_FILES); do \
 		$(call indent4, "Sourcing $$file..."); \
 		nvim --headless -c "luafile $$file" -c "qa!"; \
 	done
-	@$(call indent2, "=== Step 3 complete: All after directory configuration files sourced. ===")
+	@$(call indent2, "=== STEP 4 complete: All after directory configuration files sourced. ===")
 
 # Reinstall packer.nvim
 reinstall-packer:
