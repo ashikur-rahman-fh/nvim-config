@@ -100,8 +100,26 @@ reinstall-packer:
 	@nvim --headless -c "PackerSync" -c "qa!"
 	@$(call indent2, "=== packer.nvim reinstalled and plugins synced. ===")
 
+fetch-latest:
+	@$(call indent2, "=== Checking for uncommitted changes ===")
+	@if git diff --quiet && git diff --cached --quiet; then \
+		$(call indent4, "Working tree is clean. Proceeding..."); \
+	else \
+		$(call indent4, "Uncommitted changes found. Resetting working tree..."); \
+		git reset --hard; \
+		$(call indent4, "Working tree reset successfully."); \
+	fi
+
+	@$(call indent2, "=== Fetching latest changes ===")
+	@git fetch origin
+	@$(call indent2, "=== Latest changes fetched. ===")
+
+	@$(call indent2, "=== Pulling latest changes from master branch ===")
+	@git pull origin master
+	@$(call indent2, "=== Latest changes pulled successfully. ===")
+
 # Update target
-update: move-after-dir structure-setup install-packer sync-plugins move-back-after-dir source-after-config
+update: fetch-latest move-after-dir structure-setup install-packer sync-plugins move-back-after-dir source-after-config
 	@$(call indent2, "=== Neovim configuration updated! ===")
 
 # Help target
