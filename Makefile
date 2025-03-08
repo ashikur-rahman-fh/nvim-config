@@ -24,6 +24,21 @@ all: install
 install: structure-setup install-packer sync-plugins source-config
 	@$(call indent2, "=== Neovim setup complete! ===")
 
+# Update target
+update:
+	@$(call indent2, "=== Updating Neovim configuration ===")
+	
+	@$(call indent4, "Fetching latest changes from remote repository...")
+	@git -C $(NVIM_CONFIG_DIR) fetch origin
+
+	@$(call indent4, "Pulling latest changes from master branch...")
+	@git -C $(NVIM_CONFIG_DIR) pull origin master
+
+	@$(call indent4, "Repository updated successfully.")
+
+	@$(call indent2, "=== Running install rule to set up the configuration... ===")
+	@$(MAKE) install
+	@$(call indent2, "=== Update complete! ===")
 
 structure-setup:
 	@$(call indent2, "=== Setting up project structure ===")
@@ -87,5 +102,5 @@ help:
 	@$(call indent2, "sync-plugins      - Run :PackerSync to install/update plugins")
 	@$(call indent2, "source-config     - Source all Lua configuration files (excluding packer.lua)")
 	@$(call indent2, "reinstall-packer  - Reinstall packer.nvim and sync plugins")
+	@$(call indent2, "update            - Update Neovim configuration by fetching and pulling latest changes")
 	@$(call indent2, "help              - Show this help message")
-
