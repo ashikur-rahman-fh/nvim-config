@@ -12,5 +12,10 @@ return require('packer').startup(function(use)
     -- or                            , branch = '0.1.x',
     requires = { {'nvim-lua/plenary.nvim'} }
   }
+
+  -- themes
+  use { "catppuccin/nvim", as = "catppuccin" }
+
+  use 'navarasu/onedark.nvim'
 end)
 
