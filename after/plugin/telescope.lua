@@ -1,10 +1,6 @@
 local builtin = require('telescope.builtin')
 
-vim.keymap.set('n', '<C-p>', builtin.find_files, {})
-vim.keymap.set('n', '<C-g>', builtin.git_files, {})
-vim.keymap.set('n', '<C-s>', builtin.live_grep, {})
-
-vim.keymap.set('n', '<leader>ps', function()
-  builtin.grep_string({ search = vim.fn.input("Enter pattern for finding files: ") })
-end)
+vim.keymap.set('n', '<leader>pf', builtin.find_files, { desc = 'Search filenames in the worksplace' })
+vim.keymap.set('n', '<leader>ps', builtin.live_grep, { desc = 'Search files by text in the workspace' })
+vim.keymap.set('n', '<leader>pb', builtin.buffers, { desc = 'Display neovim buffers' })
 
