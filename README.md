@@ -15,7 +15,7 @@
 cd ~/.config/nvim
 
 # clone the repo. notice a . (dot) at the end of the command
-git clone git@github.com:ashikur-rahman-fh/nvim-config.git .
+git clone https://github.com/ashikur-rahman-fh/nvim-config.git
 ```
 
 #### Source all the plugins
