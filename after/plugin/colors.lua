@@ -39,8 +39,8 @@ require("catppuccin").setup({
 
 
 function ColorMyPencils(color)
-  color = color or "catpuccin"
-  vim.cmd.colorscheme = color
+  color = color or "catppuccin"
+  vim.cmd.colorscheme(color)
 end
 
 ColorMyPencils()
