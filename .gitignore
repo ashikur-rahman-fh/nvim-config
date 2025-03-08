@@ -1,0 +1,12 @@
+# Ignore the root-level plugin directory
+/plugin/
+
+# Ignore the root-level packer_compiled.lua file
+/packer_compiled.lua
+
+# Other ignored files and directories
+*.swp
+*.un~
+*.log
+*.tmp
+.DS_Store

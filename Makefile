@@ -1,11 +1,13 @@
 # Variables
 NVIM_CONFIG_DIR ?= $(HOME)/.config/nvim
 LUA_CONFIG_DIR ?= $(NVIM_CONFIG_DIR)/lua/ashrahma
-AFTER_CONFIG_DIR ?= $(NVIM_CONFIG_DIR)/after/plugin
+AFTER_CONFIG_DIR ?= $(NVIM_CONFIG_DIR)/after
+AFTER_PLUGIN_DIR ?= $(NVIM_CONFIG_DIR)/after/plugin
+AFTER_TMP_DIR ?= $(NVIM_CONFIG_DIR)/after.tmp
 PACKER_DIR ?= $(HOME)/.local/share/nvim/site/pack/packer/start/packer.nvim
 
 # Lua config files
-AFTER_LUA_FILES ?= $(wildcard $(AFTER_CONFIG_DIR)/*.lua)
+AFTER_LUA_FILES ?= $(wildcard $(AFTER_PLUGIN_DIR)/*.lua)
 
 # Shell function to indent output by 2 spaces (for === messages)
 define indent2
@@ -21,25 +23,30 @@ endef
 all: install
 
 # Install target
-install: structure-setup install-packer sync-plugins source-config
+install: move-after-dir structure-setup install-packer sync-plugins move-back-after-dir source-after-config
 	@$(call indent2, "=== Neovim setup complete! ===")
 
-# Update target
-update:
-	@$(call indent2, "=== Updating Neovim configuration ===")
-	
-	@$(call indent4, "Fetching latest changes from remote repository...")
-	@git -C $(NVIM_CONFIG_DIR) fetch origin
+# Move after directory to after.tmp
+move-after-dir:
+	@$(call indent2, "=== Moving after directory to after.tmp ===")
+	@if [ -d "$(AFTER_CONFIG_DIR)" ]; then \
+		$(call indent4, "Moving $(AFTER_CONFIG_DIR) to $(AFTER_TMP_DIR)..."); \
+		mv "$(AFTER_CONFIG_DIR)" "$(AFTER_TMP_DIR)"; \
+	else \
+		$(call indent4, "after directory not found. Skipping move..."); \
+	fi
 
-	@$(call indent4, "Pulling latest changes from master branch...")
-	@git -C $(NVIM_CONFIG_DIR) pull origin master
+# Move after.tmp back to after directory
+move-back-after-dir:
+	@$(call indent2, "=== Moving after.tmp back to after directory ===")
+	@if [ -d "$(AFTER_TMP_DIR)" ]; then \
+		$(call indent4, "Moving $(AFTER_TMP_DIR) back to $(AFTER_CONFIG_DIR)..."); \
+		mv "$(AFTER_TMP_DIR)" "$(AFTER_CONFIG_DIR)"; \
+	else \
+		$(call indent4, "after.tmp directory not found. Skipping move..."); \
+	fi
 
-	@$(call indent4, "Repository updated successfully.")
-
-	@$(call indent2, "=== Running install rule to set up the configuration... ===")
-	@$(MAKE) install
-	@$(call indent2, "=== Update complete! ===")
-
+# Set up project structure
 structure-setup:
 	@$(call indent2, "=== Setting up project structure ===")
 	
@@ -51,7 +58,7 @@ structure-setup:
 	@nvim --headless -c "luafile $(LUA_CONFIG_DIR)/init.lua" -c "qa!"
 	@nvim --headless -c "luafile $(NVIM_CONFIG_DIR)/init.lua" -c "qa!"
 
-# Install packer.nvim target
+# Install packer.nvim
 install-packer:
 	@$(call indent2, "=== Step 1: Installing packer.nvim ===")
 	@$(call indent4, "Checking if packer.nvim is already installed...")
@@ -63,24 +70,24 @@ install-packer:
 		$(call indent4, "packer.nvim is already installed. Skipping..."); \
 	fi
 
-# Sync plugins target
+# Sync plugins
 sync-plugins:
 	@$(call indent2, "=== Step 2: Syncing plugins with :PackerSync ===")
 	@$(call indent4, "Running :PackerSync to install/update plugins...")
 	@nvim --headless -c "luafile $(LUA_CONFIG_DIR)/packer.lua" -c "PackerSync" -c "qa!"
 	@$(call indent2, "=== Step 2 complete: Plugins synced. ===")
 
-# Source all Lua configuration files
-source-config:
-	@$(call indent2, "=== Step 3: Sourcing Lua configuration files ===")
+# Source after directory (only after plugins are installed)
+source-after-config:
+	@$(call indent2, "=== Step 3: Sourcing after directory configuration files ===")
 	@$(call indent4, "Lua files to source: $(AFTER_LUA_FILES)")
 	@for file in $(AFTER_LUA_FILES); do \
 		$(call indent4, "Sourcing $$file..."); \
 		nvim --headless -c "luafile $$file" -c "qa!"; \
 	done
-	@$(call indent2, "=== Step 3 complete: All Lua configuration files sourced. ===")
+	@$(call indent2, "=== Step 3 complete: All after directory configuration files sourced. ===")
 
-# Reinstall packer.nvim target
+# Reinstall packer.nvim
 reinstall-packer:
 	@$(call indent2, "=== Reinstalling packer.nvim ===")
 	@$(call indent4, "Removing existing packer.nvim installation...")
@@ -93,6 +100,10 @@ reinstall-packer:
 	@nvim --headless -c "PackerSync" -c "qa!"
 	@$(call indent2, "=== packer.nvim reinstalled and plugins synced. ===")
 
+# Update target
+update: move-after-dir structure-setup install-packer sync-plugins move-back-after-dir source-after-config
+	@$(call indent2, "=== Neovim configuration updated! ===")
+
 # Help target
 help:
 	@echo "Usage: make [target]"
@@ -100,7 +111,7 @@ help:
 	@$(call indent2, "install           - Install Neovim configuration and plugins")
 	@$(call indent2, "install-packer    - Install or update packer.nvim")
 	@$(call indent2, "sync-plugins      - Run :PackerSync to install/update plugins")
-	@$(call indent2, "source-config     - Source all Lua configuration files (excluding packer.lua)")
+	@$(call indent2, "source-after-config - Source after directory configuration files")
 	@$(call indent2, "reinstall-packer  - Reinstall packer.nvim and sync plugins")
 	@$(call indent2, "update            - Update Neovim configuration by fetching and pulling latest changes")
 	@$(call indent2, "help              - Show this help message")
