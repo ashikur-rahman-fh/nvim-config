@@ -1,5 +1,5 @@
 require("catppuccin").setup({
-    flavour = "latte", -- latte, frappe, macchiato, mocha
+    flavour = "mocha", -- latte, frappe, macchiato, mocha
     show_end_of_buffer = true, -- shows the '~' characters after the end of buffers
     term_colors = false,
     no_italic = true, -- Force no italic
