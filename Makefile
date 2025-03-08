@@ -106,16 +106,16 @@ fetch-latest:
 		$(call indent4, "Working tree is clean. Proceeding..."); \
 	else \
 		$(call indent4, "Uncommitted changes found. Resetting working tree..."); \
-		git reset --hard; \
+		git reset --hard > /dev/null 2>&1; \
 		$(call indent4, "Working tree reset successfully."); \
 	fi
 
 	@$(call indent2, "=== Fetching latest changes ===")
-	@git fetch origin
+	@git fetch origin > /dev/null 2>&1
 	@$(call indent2, "=== Latest changes fetched. ===")
 
 	@$(call indent2, "=== Pulling latest changes from master branch ===")
-	@git pull origin master
+	@git pull origin master > /dev/null 2>&1
 	@$(call indent2, "=== Latest changes pulled successfully. ===")
 
 # Update target
