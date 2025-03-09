@@ -2,7 +2,7 @@
 
 require('mason').setup({})
 require('mason-lspconfig').setup({
-  ensure_installed = {'clangd'},
+  ensure_installed = {'clangd', 'pyright', 'gopls', 'bashls' },
   handlers = {
     function(server_name)
       require('lspconfig')[server_name].setup({})
@@ -34,12 +34,15 @@ cmp.setup({
   -- Enable completion on 2 characters
   completion = {
     keyword_length = 2,
+    debounce = 150,
   },
 
   -- Define the sources for completion
   sources = {
-    { name = 'nvim_lsp' }, -- LSP-based completions
-    { name = 'buffer' },   -- Buffer-based completions
+    { name = 'buffer', priority = 10 }, -- Buffer-based completions
+    { name = 'path', priority = 7 }, -- Path completions
+    { name = 'nvim_lsp', priority = 6 }, -- LSP-based completions
+    { name = 'luasnip', priority = 5 }, -- Lua snip completions
   },
 
   -- Mapping configuration
@@ -78,5 +81,118 @@ cmp.setup({
     completion = cmp.config.window.bordered(),
     documentation = cmp.config.window.bordered(),
   },
+})
+
+-- Enable command-line completions
+cmp.setup.cmdline(':', {
+  sources = cmp.config.sources({
+    { name = 'cmdline' },
+  }),
+})
+
+----------------------------------------------------
+--- Language specific on attach of lspconfig
+----------------------------------------------------
+
+-- Pyright (Python)
+local pyright_on_attach = function(client, bufnr)
+  common_on_attach(client, bufnr) -- Include common functionality
+
+  -- Python-specific keybindings or behavior
+  vim.keymap.set('n', '<leader>pi', '<cmd>PyrightOrganizeImports<CR>', { buffer = bufnr })
+end
+
+-- Gopls (Go)
+local gopls_on_attach = function(client, bufnr)
+  common_on_attach(client, bufnr) -- Include common functionality
+
+  -- Go-specific keybindings or behavior
+  vim.keymap.set('n', '<leader>gi', '<cmd>GoImport<CR>', { buffer = bufnr })
+  vim.keymap.set('n', '<leader>gt', '<cmd>GoTest<CR>', { buffer = bufnr })
+end
+
+-- Bashls (Bash)
+local bashls_on_attach = function(client, bufnr)
+  common_on_attach(client, bufnr) -- Include common functionality
+
+  -- Bash-specific keybindings or behavior
+  vim.keymap.set('n', '<leader>bs', '<cmd>ShellCheck<CR>', { buffer = bufnr })
+end
+
+
+------------------------------------------
+--- Language specific lspconfig settings
+------------------------------------------
+
+-- Pyright (Python)
+lspconfig.pyright.setup({
+  on_attach = pyright_on_attach,
+  settings = {
+    python = {
+      analysis = {
+        autoSearchPaths = true,
+        useLibraryCodeForTypes = true,
+        diagnosticMode = 'workspace',
+      },
+    },
+  },
+})
+
+-- Gopls (Go)
+lspconfig.gopls.setup({
+  on_attach = gopls_on_attach,
+  settings = {
+    gopls = {
+      buildFlags = { '-buildvcs=false' }, -- Prevent VCS metadata files
+      analyses = {
+        unusedparams = true,
+      },
+      staticcheck = true,
+    },
+  },
+})
+
+-- Bashls (Bash)
+lspconfig.bashls.setup({
+  on_attach = bashls_on_attach,
+  filetypes = { 'sh', 'bash' },
+})
+
+
+-------------------------------------------
+--- Language specific editor settings     
+-------------------------------------------
+
+-- Python
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'python',
+  callback = function()
+    vim.opt_local.tabstop = 4
+    vim.opt_local.softtabstop = 4
+    vim.opt_local.shiftwidth = 4
+  end,
+})
+
+-- Set environment variable to prevent Python from writing bytecode
+vim.env.PYTHONDONTWRITEBYTECODE = '1'
+
+-- Go
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'go',
+  callback = function()
+    vim.opt_local.tabstop = 4
+    vim.opt_local.softtabstop = 4
+    vim.opt_local.shiftwidth = 4
+  end,
+})
+
+-- Bash
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'sh',
+  callback = function()
+    vim.opt_local.tabstop = 2
+    vim.opt_local.softtabstop = 2
+    vim.opt_local.shiftwidth = 2
+  end,
 })
 
