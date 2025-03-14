@@ -2,7 +2,7 @@
 
 require('mason').setup({})
 require('mason-lspconfig').setup({
-  ensure_installed = {'clangd', 'pyright', 'gopls', 'bashls' },
+  ensure_installed = {'clangd', 'pyright', 'bashls' },
   handlers = {
     function(server_name)
       require('lspconfig')[server_name].setup({})
@@ -154,19 +154,19 @@ lspconfig.pyright.setup({
 })
 
 -- Gopls (Go)
-lspconfig.gopls.setup({
-  on_attach = gopls_on_attach,
-  settings = {
-    gopls = {
-      buildFlags = { '-buildvcs=false' }, -- Prevent VCS metadata files
-      analyses = {
-        unusedparams = true,
-      },
-      staticcheck = true,
-    },
-  },
-})
-
+--lspconfig.gopls.setup({
+--  on_attach = gopls_on_attach,
+--  settings = {
+--    gopls = {
+--      buildFlags = { '-buildvcs=false' }, -- Prevent VCS metadata files
+--      analyses = {
+--        unusedparams = true,
+--      },
+--      staticcheck = true,
+--    },
+--  },
+--})
+--
 -- Bashls (Bash)
 lspconfig.bashls.setup({
   on_attach = bashls_on_attach,
