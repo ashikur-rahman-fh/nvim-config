@@ -31,9 +31,9 @@ vim.lsp.handlers["textDocument/publishDiagnostics"] = function() end
 local cmp = require('cmp')
 
 cmp.setup({
-  -- Enable completion on 2 characters
+  -- Enable completion on 3 characters
   completion = {
-    keyword_length = 2,
+    keyword_length = 3,
     debounce = 150,
   },
 
@@ -49,14 +49,6 @@ cmp.setup({
   mapping = {
     -- Use Tab to select the top option
      -- Use Tab to select and confirm the current suggestion
-    ['<Tab>'] = cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.confirm({ select = true }) -- Select and confirm the current suggestion
-      else
-        fallback() -- Fallback to default behavior if completion is not visible
-      end
-    end, { 'i', 's' }), -- Apply to insert and select modes
-
     -- Use Ctrl+n for next item
     ['<C-n>'] = cmp.mapping.select_next_item(),
 
@@ -68,12 +60,34 @@ cmp.setup({
       behavior = cmp.ConfirmBehavior.Replace,
       select = false, -- Don't automatically select the first item
     }),
-
-    -- Disable default behavior of inserting the top selection on Enter
-    ['<C-y>'] = cmp.config.disable, -- Disable default confirm behavior
-
-    -- Use Ctrl+Space to force-show completion options
-    ['<C-Space>'] = cmp.mapping.complete(),
+    
+    -- TAB to go to the next completion option
+    ['<Tab>'] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+        cmp.select_next_item()
+      else
+        fallback()
+      end
+    end, { 'i', 's' }),
+    
+    -- SHIFT + TAB to go to the previous completion option
+    ['<S-Tab>'] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+        cmp.select_prev_item()
+      else
+        fallback()
+      end
+    end, { 'i', 's' }),
+   
+    -- CTRL + SPACE to open completion menu if not visible
+    -- OR Select the top one if visible
+    ['<C-Space>'] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+        cmp.confirm({ select = true })
+      else
+        cmp.complete()
+      end
+    end, { 'i', 's' }),
   },
 
   -- Additional configuration for the completion window
