@@ -18,6 +18,14 @@ cd ~/.config/nvim
 git clone https://github.com/ashikur-rahman-fh/nvim-config.git .
 ```
 
+### Requirements
+```
+gcc
+npm
+python
+```
+
+
 #### Source all the plugins
 ```
 make install
